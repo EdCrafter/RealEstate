@@ -227,10 +227,44 @@ bool RealEstate::postNewProperty(unsigned int i) {
 		return false;
 	}
 	else {
+		ASD::String city, street;
 		user.setLimit(-1);
-
-		std::cout << "                        " << user.getLimit() << "\n";
+		city=chooseCity();
+		std::cout << "wllwdwqqmkd" << "\n";
+		street=chooseStreet(city);
 		_getch();
 	}
 	return true;
+}
+
+ASD::String RealEstate::chooseCity() {
+	ASD::String city;
+	::SetColor(White, Black);
+	cls();
+	ASD::FunctionMenu pPMenu("City", 1);
+	pPMenu.SetHeight(5).SetWidth(20).HCenter().VCenter();
+	for (int i = 0; i < addresses.getCitiesName().GetCount(); i++) {
+		pPMenu.addItem(addresses.getCitiesName()[i].get(), [this,i, &city]() {
+			city = addresses.getCitiesName()[i];
+			::SetColor(White, Black);
+			cls();
+			});
+	}
+	pPMenu.Select();
+	return city;
+}
+ASD::String RealEstate::chooseStreet(ASD::String city) {
+	ASD::String street;
+	ASD::FunctionMenu streetMenu("Street", 1);
+	streetMenu.SetHeight(5).SetWidth(20).HCenter().VCenter();
+	for (int i = 0; i < addresses.getCityStreets(city).GetCount(); i++) {
+		streetMenu.addItem(addresses.getCityStreets(city)[i].get(), [this, &i, &street, &city]() {
+			street = addresses.getCityStreets(city)[i];
+			::SetColor(White, Black);
+			cls();
+			});
+	}
+	streetMenu.Select();
+
+	return street;
 }

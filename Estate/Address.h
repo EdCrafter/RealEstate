@@ -1,15 +1,32 @@
 #pragma once
 #include "Array.h"
 #include "String.h"
-class Address
+class Address 
 {
-	struct city
+	class City
 	{
+	public:
 		ASD::String name;
 		ASD::Array<ASD::String> streets;
+		City& operator = (City& other) {
+			name = other.name;
+			streets = other.streets;
+			return *this;
+		}
 	};
-	ASD::Array<city> cities;
+	ASD::Array<City> cities;
 public:
+	Address() : cities() {}
+	Address(ASD::Array<City> cities) {
+		this->cities = cities;
+	}
+	Address (Address& other) {
+		cities = other.cities;
+	}
+	Address& operator = (Address& other) {
+		cities = other.cities;
+		return *this;
+	}
 	ASD::Array<ASD::String> getCitiesName() {
 		ASD::Array<ASD::String> citiesName;
 		int i = 0;
@@ -24,7 +41,7 @@ public:
 		int i = 0;
 		while (i < cities.GetCount()) {
 			if (cityIn == cities[i].name) {
-				streetsR.Add(cities[i].streets);
+				streetsR=cities[i].streets;
 				break;
 			}
 			i++;
@@ -57,12 +74,14 @@ public:
 			i++;
 		}
 		if (!in) {
-			city newCity;
+			
+			City newCity;
 			newCity.name = cityIn;
 			newCity.streets = streetsIn;
 			cities.Add(newCity);
 		}
 		return *this;
 	}
+
 };
 

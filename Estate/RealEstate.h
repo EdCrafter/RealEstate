@@ -19,5 +19,7 @@ public:
 	bool logIn();
 	bool setToStandartAddresses();
 	bool postNewProperty(unsigned int);
+	ASD::String chooseCity();
+	ASD::String chooseStreet(ASD::String city);
 };
 

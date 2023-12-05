@@ -5,6 +5,7 @@
 #include "fun_console.h"
 #include <functional>
 #include <vector>
+#include <string>
 
 namespace ASD {
 	class Window
@@ -136,6 +137,10 @@ namespace ASD {
 		void addItem(const std::string& label, const std::function<void()>& action) {
 			items.emplace_back(label, action);
 			Add(label.c_str());
+		}
+		void addItem(const char* label, const std::function<void()>& action) {
+			items.emplace_back(label, action);
+			Add(label);
 		}
 		void getCountAction() {
 			items[active].action();
