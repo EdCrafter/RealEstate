@@ -94,8 +94,9 @@ namespace ASD {
 	class ArrayMenu: public Menu{
 	protected:
 		Array<String> items;
+		unsigned int heightRow;
 	public:
-		ArrayMenu() : Menu() {
+		ArrayMenu() : Menu() , heightRow(1) {
 
 		}
 		void Add(const char * m) { items.Add(m); }
@@ -105,7 +106,14 @@ namespace ASD {
 		void DrawItem(int row, int index) {
 			Write(0, row, items[index]);
 		}
-
+		ArrayMenu& setHeightRow(unsigned int h) {
+			if (h) {
+				heightRow = h;
+			}
+			return *this;
+		}
+		int Select();
+	
 	};
 
 	class MenuItem {
@@ -166,6 +174,7 @@ namespace ASD {
 			std::cout << buf[1];
 			return *this;
 		};
+		FunctionMenu& Write(int, int, const char*,bool);
 	};
 
 

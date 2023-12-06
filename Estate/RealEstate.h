@@ -8,8 +8,9 @@ class RealEstate
 {
 	ASD::String brokerPassword = "broker";
 	Users users;
+	User* user;
 	Properties properties;
-	Address addresses;
+	Addresses addresses;
 public:
 	
 	RealEstate() {
@@ -18,8 +19,17 @@ public:
 	bool createUser();
 	bool logIn();
 	bool setToStandartAddresses();
-	bool postNewProperty(unsigned int);
+	bool postNewProperty();
 	ASD::String chooseCity();
 	ASD::String chooseStreet(ASD::String city);
+	unsigned int chooseTypeEstate();
+	int inputFloorNumber();
+	unsigned int inputCountRooms();
+	unsigned int inputPrice();
+	unsigned int inputHouseNumber();
+	bool inputForRent();
+	void removeProperty();
+	bool printAllProperties();
+	void showMainMenu();
 };
 

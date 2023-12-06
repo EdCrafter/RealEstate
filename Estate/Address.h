@@ -1,7 +1,7 @@
 #pragma once
 #include "Array.h"
 #include "String.h"
-class Address 
+class Addresses
 {
 	class City
 	{
@@ -16,14 +16,14 @@ class Address
 	};
 	ASD::Array<City> cities;
 public:
-	Address() : cities() {}
-	Address(ASD::Array<City> cities) {
+	Addresses() : cities() {}
+	Addresses(ASD::Array<City> cities) {
 		this->cities = cities;
 	}
-	Address (Address& other) {
+	Addresses(Addresses& other) {
 		cities = other.cities;
 	}
-	Address& operator = (Address& other) {
+	Addresses& operator = (Addresses& other) {
 		cities = other.cities;
 		return *this;
 	}
@@ -48,7 +48,7 @@ public:
 		}
 		return streetsR;
 	}	
-	Address& addAddress(ASD::String cityIn, ASD::Array<ASD::String> streetsIn) {
+	Addresses& addAddress(ASD::String cityIn, ASD::Array<ASD::String> streetsIn) {
 		int i = 0,j,k,repeat;
 		int in = 0;
 		while (i < cities.GetCount()) {
@@ -85,3 +85,21 @@ public:
 
 };
 
+class Address {
+	ASD::String name;
+	ASD::String street;
+public:
+	Address(const Address& other) {
+		name = other.name;
+		street = other.street;
+	}
+	Address (ASD::String name,ASD::String street) {
+		this->name = name;
+		this->street = street;
+	}
+	Address& set(ASD::String name,ASD::String street) {
+		this->name = name;
+		this->street = street;
+	}
+
+};

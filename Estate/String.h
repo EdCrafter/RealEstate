@@ -7,6 +7,7 @@ namespace ASD {
 		char* str;
 	public:
 		String(String& s) { str = 0; add(s.str); }
+		String(const String& s) { str = 0; add(s.str); }
 		String(const char* s = 0) { str = 0; add(s); }
 		String(char c, size_t len);
 		~String() { empty(); }
@@ -18,6 +19,7 @@ namespace ASD {
 		String& add(String& s) { return add(s.str); }
 
 		String& operator = (String& s) { empty();  return add(s.str); }
+		String& operator = (const String& s) { empty();  return add(s.str); }
 		String& operator = (const char* s) { empty();  return add(s); }
 
 		String& operator += (String& s) { return add(s.str); }
@@ -45,6 +47,7 @@ namespace ASD {
 
 
 		String operator + (const char* s) { return String(get()).add(s); }
+		String operator + (String& s2) { return String(get()).add(s2); }
 		friend String operator + (const char* s1, String& s2);
 		friend std::ostream& operator << (std::ostream& c, ASD::String& s);
 		//

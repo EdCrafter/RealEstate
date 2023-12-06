@@ -82,11 +82,62 @@ ASD::Window & ASD::Window::Write(int _x, int _y, const char * str) {
 	}
 	//::SetColor(color, bgColor);
 	GotoXY(x + _x + 1, y + _y + 1);
-	for (int i = 0; str[i]; i++) {
-		if (_x + i >= GetClientWidth()) {
+	int l = 1;
+	int q = 1;
+	for (int i = 0; i<GetClientWidth(); i++) {
+		if (_x + i -(l-1)*i >= GetClientWidth() ) {
+			GotoXY(x + _x + 1, y + _y + l+1);
+			l++;
+		}
+		if (str[i] == '\n') {
+			GotoXY(x + _x + 1, y + _y + l + 1);
+			l++;
+			continue;
+		}
+		if (!str[i]) {
+			q = 0;
+			setlocale(0, "en");
+		}
+		if (q) {
+			std::cout << str[i];
+		}
+		else {
+			std::cout << " ";
+		}
+	}
+	return *this;
+}
+ASD::FunctionMenu & ASD::FunctionMenu::Write(int _x, int _y, const char * str,bool isTitle=0) {
+	if (_x >= GetClientWidth() ||  _y >= GetClientHeight()) {
+		return *this;
+	}
+	//::SetColor(color, bgColor);
+	GotoXY(x + _x + 1, y + _y + 1);
+	int l = 1;
+	int q = 1;
+	for (int i = 0; i<GetClientWidth(); i++) {
+		if (_x + i -(l-1)*i >= GetClientWidth() ) {
+			GotoXY(x + _x + 1, y + _y + l+1);
+			l++;
+		}
+		if (str[i] == '\n') {
+			GotoXY(x + _x + 1, y + _y + l + 1);
+			l++;
+			continue;
+		}
+		if (!str[i]) {
+			q = 0;
+			setlocale(0, "en");
+		}
+		if (q) {
+			std::cout << str[i];
+		}
+		else if (isTitle) {
 			break;
 		}
-		std::cout << str[i];
+		else {
+			std::cout << " ";
+		}
 	}
 	return *this;
 }
@@ -192,9 +243,8 @@ int ASD::Menu::Select() {
 	ShowCaret(false);
 	active = 0;
 	first = 0;
+	Show();
 	while (1) {
-		Show();
-
 		if (active > first + GetClientHeight() - 1) {
 			first = active - GetClientHeight() + 1;
 		}
@@ -206,9 +256,6 @@ int ASD::Menu::Select() {
 			if (j == active) {
 				::SetColor(selectColor, selectBgColor);
 				::GotoXY(x + 1, y + 1 + i);
-				for (int k = 0; k < GetClientWidth(); k++) {
-					std::cout << " ";
-				}
 			}
 			else {
 				::SetColor(color, bgColor);
@@ -238,6 +285,58 @@ int ASD::Menu::Select() {
 	ShowCaret(true);
 	return active;
 }
+int ASD::ArrayMenu::Select() {
+	if (GetCount() == 0) {
+		active = -1;
+		return active;
+	}
+	ShowCaret(false);
+	active = 0;
+	first = 0;
+	
+	Show();
+	while (1) {
+		if (active > first + GetClientHeight() - 1) {
+			first = active - GetClientHeight() + 1;
+		}
+		else if (active < first) {
+			first = active;
+		}
+
+		for (int i = 0, j = first; i < GetClientHeight() && j/3 < GetCount(); i+=heightRow, j+=heightRow) {
+			if (j == active) {
+				::SetColor(selectColor, selectBgColor);
+				::GotoXY(x + 1, y + 1 + i);
+			}
+			else {
+				::SetColor(color, bgColor);
+				
+			}
+			DrawItem(i, j/heightRow);
+		}
+		int key = _getch();
+		if (key == 224) {
+			key = _getch();
+			if (key == 80 && active + 1 < GetCount()) { //down
+				active+=heightRow;
+			}
+			if (key == 72 && active > 0) { //down
+				active-=heightRow;
+			}
+			continue;
+		}
+		if (key == 27) {
+			active = -1;
+			break;
+		}
+		if (key == 13) {
+			break;
+		}
+
+	}
+	ShowCaret(true);
+	return active;
+}
 int ASD::FunctionMenu::Select() {
 	if (GetCount() == 0) {
 		active = -1;
@@ -246,10 +345,11 @@ int ASD::FunctionMenu::Select() {
 	ShowCaret(false);
 	active = 2;
 	first = 0;
+	height -= 2;
+	Show();
+	height += 2;
 	while (1) {
-		height -= 2;
-		Show();
-		height += 2;
+		
 		if (active > first + GetClientHeight() - 1) {
 			first = active - GetClientHeight() + 1;
 		}
@@ -272,7 +372,7 @@ int ASD::FunctionMenu::Select() {
 			}
 			if (!i) {
 				int left = (GetClientWidth()-strlen(title))/2;
-				Write(left, -2, (const char*)(title));
+				Write(left, -2, (const char*)(title),1);
 			}
 			if (j > 1 && i>1) {
 				DrawItem(i-2, j-2);
