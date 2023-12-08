@@ -13,6 +13,12 @@ class Addresses
 			streets = other.streets;
 			return *this;
 		}
+		void toString() {
+			std::cout << "name    = " << name << "\n";
+			for (int i = 0; i < streets.GetCount(); i++) {
+				std::cout << "street("<<i<<")=" << streets[i] << "\n";
+			}
+		}
 	};
 	ASD::Array<City> cities;
 public:
@@ -82,7 +88,13 @@ public:
 		}
 		return *this;
 	}
-
+	void toString() {
+		for (int i = 0; i < cities.GetCount(); i++) {
+			std::cout << "City id = " << i << "\n";
+			cities[i].toString();
+			std::cout << "\n";
+		}
+	}
 };
 
 class Address {
@@ -101,5 +113,8 @@ public:
 		this->name = name;
 		this->street = street;
 	}
-
+	void toString() {
+		std::cout << "name   = " << name << "\n";
+		std::cout << "street = " << street << "\n";
+	}
 };

@@ -11,7 +11,7 @@ protected:
 	ASD::String type;
 	int limit;
 public:
-	User() : name(), password(), phone(), type(),limit() {}
+	User() : name(), password(), phone(), type(), limit() {}
 	User(ASD::String& newName, ASD::String& newPassword,ASD::String& newPhone,ASD::String& newType,int newLimit)
 		: name(newName), password(newPassword), phone(newPhone), type(newType),limit(newLimit) {}
 
@@ -46,7 +46,23 @@ public:
 		limit = other.limit;
 		return *this;
 	}
-
+	bool operator != (User& other) {
+		return (!(*this == other));
+	}
+	bool operator == (User& other) {
+		if (
+			name == other.name
+			) {
+			return true;
+		}
+		return false;
+	}
+	void toString() {
+		std::cout << "name =     " << name << "\n";
+		std::cout << "password = " << password << "\n";
+		std::cout << "name =     " << phone << "\n";
+		std::cout << "name =     " << type << "\n";
+	}
 };
 
 
@@ -70,6 +86,13 @@ public:
 		User user(name,password,phone,type,limit);
 		users.Add(user);
 		return true;
+	}
+	void toString() {
+		for (int i = 0; i < users.GetCount(); i++) {
+			std::cout << "User id = " << i << "\n";
+			users[i].toString();
+			std::cout << "\n";
+		}
 	}
 
 };

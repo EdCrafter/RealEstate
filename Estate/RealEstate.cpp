@@ -83,6 +83,7 @@ bool RealEstate::createUser() {
 	win.Show();
 	win.SetWidth(47);
 	do {
+		win.Show();
 		win.Write(0, 0, "Input type user Customer/Broker(C/B):");
 		in.setLength(1);
 		in.Move(win.GetX() + 38, win.GetY() + 1);
@@ -134,7 +135,6 @@ bool RealEstate::logIn() {
 	in.process(0);
 	password = in.get();
 	int i = 0;
-
 	while (i < users.getUsers().GetCount()) {
 		if (users.getUsers()[i].getName() == name) {
 			if (users.getUsers()[i].getPassword() == password) {
@@ -373,20 +373,46 @@ bool RealEstate::inputForRent() {
 	cls();
 	return rent;
 }
-
-void removeProperty() {
-
+void RealEstate::removeProperty() {
+	int i = printAllProperties(1);
+	if (i+1) {
+		properties.remove(i);
+		user->setLimit(1);
+		::SetColor(White, Black);
+		cls();
+		ASD::Window w;
+		w.SetWidth(34).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+		w.Show();
+		w.Write(0, 0, "Property Successfully Removed");
+		_getch();
+	}
+	else {
+		::SetColor(White, Black);
+		cls();
+		ASD::Window w;
+		w.SetWidth(34).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+		w.Show();
+		w.Write(0, 0, "Properties not found");
+		_getch();
+	}
 }
-
-bool RealEstate::printAllProperties() {
+int RealEstate::printAllProperties(bool useUser=0) {
+	
 	ASD::ArrayMenu window;
-	window.SetHeight(8).SetWidth(60).HCenter().VCenter();
+	window.SetHeight(8).SetWidth(60).HCenter().VCenter().SetColor(LightGray);
 	setlocale(0, "en");
-	if (!properties.getProperties().GetCount()) return false;
+	if (!properties.getProperties().GetCount()) return -1;
+	int* arrInd = new int[properties.getProperties().GetCount()];
 	window.setHeightRow(3);
-	for (int i = 0; i < properties.getProperties().GetCount(); i++) {
+	for (int i = properties.getProperties().GetCount()-1 , j=0; i+1; i--) {
+		
 		Properties::PropertyData property(properties.getProperty(i));
-		ASD::String typeStr, floorNumber, forRent;
+		if (useUser && user != property.user) {
+			continue;
+		}
+		arrInd[j] = i;
+		j++;
+		ASD::String typeStr, floorNumber, forRent,userType;
 		bool floor = 0;
 		switch (property.type)
 		{
@@ -405,7 +431,7 @@ bool RealEstate::printAllProperties() {
 		}
 		if (floor) {
 			floorNumber = ",floor ";
-			floorNumber + std::to_string(property.floorNumber).c_str();
+			floorNumber += std::to_string(property.floorNumber).c_str();
 		}
 		if (property.forRent) {
 			forRent = "for rent";
@@ -413,17 +439,92 @@ bool RealEstate::printAllProperties() {
 		else {
 			forRent = "for sale";
 		}
+		if (property.user->getType() == "c") {
+			userType = "(individual)";
+		}
+		else {
+			userType = "(broker)";
+		}
 		ASD::String str = typeStr + " " + forRent + " " + std::to_string(property.countRooms).c_str();
-		str += " rooms " + floorNumber + ".\n" + "Price";
+		str += " rooms " + floorNumber + ".\n" + "Price :"+std::to_string(property.price).c_str();
+		str += " dollars.\nContacts:";
+		str+=property.user->getName();
+		str += " ";
+		str+=property.user->getPhone();
+		str += " " + userType+".";
 		window.Add(str.get());
 	}
+	if (!window.GetCount()) return -1;
+	int selected = arrInd[window.Select()];
+	delete[] arrInd;
+	return selected;
+}
+bool RealEstate::printPropertiesByParametrs(RealEstate::parametrs arr) {
+	
+	ASD::ArrayMenu window;
+	window.SetHeight(8).SetWidth(60).HCenter().VCenter().SetColor(LightGray);
+	setlocale(0, "en");
+	if (!properties.getProperties().GetCount()) return false;
+	window.setHeightRow(3);
+	for (int i = properties.getProperties().GetCount()-1; i+1; i--) {
+		
+		Properties::PropertyData property(properties.getProperty(i));
+		if ((arr.countRooms != 999 && arr.countRooms != property.countRooms )
+			|| arr.forRent != property.forRent ||
+			(arr.type != 999 && arr.type != property.type) ||
+			arr.minPrice>property.price || arr.maxPrice < property.price
+			) {
+			continue;
+		}
+		ASD::String typeStr, floorNumber, forRent,userType;
+		bool floor = 0;
+		switch (property.type)
+		{
+		case 1:
+			typeStr = "Appartment";
+			floor = 1;
+			break;
+		case 2:
+			typeStr = "Penthouse";
+			break;
+		case 3:
+			typeStr = "Private house";
+			break;
+		default:
+			typeStr = "Estate";
+		}
+		if (floor) {
+			floorNumber = ",floor ";
+			floorNumber += std::to_string(property.floorNumber).c_str();
+		}
+		if (property.forRent) {
+			forRent = "for rent";
+		}
+		else {
+			forRent = "for sale";
+		}
+		if (property.user->getType() == "c") {
+			userType = "(individual)";
+		}
+		else {
+			userType = "(broker)";
+		}
+		ASD::String str = typeStr + " " + forRent + " " + std::to_string(property.countRooms).c_str();
+		str += " rooms " + floorNumber + ".\n" + "Price :"+std::to_string(property.price).c_str();
+		str += " dollars.\nContacts:";
+		str+=property.user->getName();
+		str += " ";
+		str+=property.user->getPhone();
+		str += " " + userType+".";
+		window.Add(str.get());
+	}
+	if (!window.GetCount()) return false;
 	window.Select();
 	return true;
 }
-
 void RealEstate::showMainMenu() {
 	ASD::FunctionMenu mainMenu("Menu", 1);
-	mainMenu.SetHeight(5).SetWidth(20).HCenter().VCenter();
+	mainMenu.setSelectColor(Cyan).SetHeight(5).SetWidth(40).HCenter().VCenter().SetBgColor(Green).SetBorderColor(Magenta).SetColor(Yellow);
 	mainMenu.addItem("Post New Property", [this, &mainMenu]() {
 		if (!postNewProperty()) {
 			::SetColor(White, Black);
@@ -438,22 +539,43 @@ void RealEstate::showMainMenu() {
 		cls();
 		mainMenu.Select();
 		});
-	mainMenu.addItem("Post New Property", [this, &mainMenu]() {
-		if (!postNewProperty()) {
-			::SetColor(White, Black);
-			cls();
-			ASD::Window w;
-			w.SetWidth(34).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
-			w.Show();
-			w.Write(0, 0, "Your Ad Limit Has Been Reached");
-			_getch();
-		}
+	mainMenu.addItem("Remove Property", [this, &mainMenu]() {
+		removeProperty();
 		::SetColor(White, Black);
 		cls();
 		mainMenu.Select();
 		});
 	mainMenu.addItem("Print All Properties", [this, &mainMenu]() {
-		if (!printAllProperties()) {
+		if (!(printAllProperties()+1)) {
+			::SetColor(White, Black);
+			cls();
+			ASD::Window w;
+			w.SetWidth(34).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+			w.Show();
+			w.Write(0, 0, "Properties not found");
+			_getch();
+		}
+		::SetColor(White, Black);
+		cls();
+		mainMenu.Select();
+		});
+	mainMenu.addItem("Print my Properties", [this, &mainMenu]() {
+		if (!(printAllProperties(1)+1)) {
+			::SetColor(White, Black);
+			cls();
+			ASD::Window w;
+			w.SetWidth(34).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+			w.Show();
+			w.Write(0, 0, "Properties not found");
+			_getch();
+		}
+		::SetColor(White, Black);
+		cls();
+		mainMenu.Select();
+		});
+	mainMenu.addItem("Print properties by parametrs", [this, &mainMenu]() {
+		parametrs arr = propertiesByParametrs();
+		if (!printPropertiesByParametrs(arr)) {
 			::SetColor(White, Black);
 			cls();
 			ASD::Window w;
@@ -469,4 +591,82 @@ void RealEstate::showMainMenu() {
 
 	mainMenu.Select();
 }
+RealEstate::parametrs RealEstate::propertiesByParametrs() {
+	RealEstate::parametrs arr;
+	setlocale(0, "en");
+	ASD::Window win;
+	win.SetWidth(50).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+	win.Show();
+	ASD::InputV2 in(1, win.GetX() + 47, win.GetY() + 1);
+	win.Write(0, 0, "You are looking for a rented property (1/0) :");
+	in.process(3);
+	arr.forRent = atoi(in.get());
+	win.SetHeight(5);
+	win.Write(0, 0, "                                              ");
+	win.Show();
+	win.Write(0, 0, "You are looking for an apartment (1) ,");
+	win.Write(0, 1, "penthouse(2), private house(3) ");
+	win.Write(0, 2, "or all of this(999) :");
+	in.setLength(3);
+	in.Move(win.GetX() + 23, win.GetY() + 3);
+	in.process(3);
+	arr.type = atoi(in.get());
+	::SetColor(15, 0);
+	cls();
+	win.SetHeight(3);
+	win.SetWidth(32);
+	win.Show();
+	win.Write(0, 0, "                         ");
+	win.Write(0, 0, "How many rooms (all:999):");
+	in.Move(win.GetX() + 27, win.GetY() + 1);
+	in.process(3);
+	arr.countRooms = atoi(in.get());
+	in.setLength(7);
+	win.Show();
+	win.Write(0, 0, "                ");
+	win.Write(0, 0, "Input min price:");
+	in.Move(win.GetX() + 18, win.GetY() + 1);
+	in.process(3);
+	arr.minPrice = atoi(in.get());
+	win.Show();
+	win.Write(0, 0, "                 ");
+	win.Write(0, 0, "Input max price:");
+	in.Move(win.GetX() + 18, win.GetY() + 1);
+	in.process(3);
+	arr.maxPrice = atoi(in.get());
+	return arr;
+}
 
+void RealEstate::start() {
+	ASD::FunctionMenu myInterface("Real Estate", 1);
+	myInterface.SetHeight(5).SetWidth(20).HCenter().VCenter();
+	myInterface.addItem("Sign up", [this, &myInterface]() {
+		if ((*this).createUser()) {
+			::SetColor(White, Black);
+			cls();
+			ASD::Window w;
+			w.SetWidth(20).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+			w.Show();
+			w.Write(0, 0, "User created");
+		}
+		_getch();
+		::SetColor(White, Black);
+		cls();
+		myInterface.Select();
+		});
+	myInterface.addItem("Log in", [this, &myInterface]() {
+		if (!(*this).logIn()) {
+			::SetColor(White, Black);
+			cls();
+			ASD::Window w;
+			w.SetWidth(30).SetHeight(3).SetColor(Green).SetBgColor(Yellow).VCenter().HCenter();
+			w.Show();
+			w.Write(0, 0, "Error user name or password");
+			_getch();
+		}
+		::SetColor(White, Black);
+		cls();
+		myInterface.Select();
+		});
+	myInterface.Select();
+}

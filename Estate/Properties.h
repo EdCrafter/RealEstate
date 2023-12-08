@@ -48,6 +48,16 @@ public:
             user(usr)
         {
         }
+        void toString() {
+            address.toString();
+            std::cout << "Count rooms  = " << countRooms << "\n";
+            std::cout << "Price        = " << price << "\n";
+            std::cout << "Type         = " << type << "\n";
+            std::cout << "For Rent     = " << forRent << "\n";
+            std::cout << "House Number = " << houseNumber << "\n";
+            std::cout << "Floor Number = " << floorNumber << "\n";
+            user->toString();
+        }
     };
 private:
     ASD::Array<PropertyData> properties;
@@ -72,7 +82,16 @@ public:
     PropertyData getProperty(int i) {
         return properties[i];
     }
-
+    void remove(unsigned int i) {
+        properties.RemoveAt(i);
+    }
+    void toString() {
+        for (int i = 0; i < properties.GetCount(); i++) {
+            std::cout << "Property id = " << i << "\n";
+            properties[i].toString();
+            std::cout << "\n";
+        }
+    }
 };
 
 

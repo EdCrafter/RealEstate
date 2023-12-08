@@ -11,6 +11,14 @@ class RealEstate
 	User* user;
 	Properties properties;
 	Addresses addresses;
+	struct parametrs
+	{
+		bool forRent;
+		unsigned int type;
+		unsigned int countRooms;
+		unsigned int minPrice;
+		unsigned int maxPrice;
+	};
 public:
 	
 	RealEstate() {
@@ -29,7 +37,16 @@ public:
 	unsigned int inputHouseNumber();
 	bool inputForRent();
 	void removeProperty();
-	bool printAllProperties();
+	int printAllProperties(bool useUser);
 	void showMainMenu();
+	bool printPropertiesByParametrs(parametrs arr);
+	parametrs propertiesByParametrs();
+	void toString() {
+		std::cout << "broker password : " << brokerPassword << "\n";
+		users.toString();
+		properties.toString();
+		addresses.toString();	
+	}
+	void start();
 };
 

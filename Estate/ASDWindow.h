@@ -89,6 +89,14 @@ namespace ASD {
 		virtual int Select();
 		virtual int GetCount() = 0;
 		virtual void DrawItem(int row, int index) = 0;
+		Menu& setSelectColor(int c) { 
+			selectColor = c;
+			return *this;
+		}
+		Menu& setSelectBgColor(int c) {
+			selectBgColor = c; 
+			return *this;
+		}
 	};
 
 	class ArrayMenu: public Menu{
@@ -107,7 +115,7 @@ namespace ASD {
 			Write(0, row, items[index]);
 		}
 		ArrayMenu& setHeightRow(unsigned int h) {
-			if (h) {
+			if (h && h<=GetClientHeight()) {
 				heightRow = h;
 			}
 			return *this;
@@ -154,7 +162,7 @@ namespace ASD {
 			items[active].action();
 		}
 		int Select();
-		Window& Show() {
+		FunctionMenu& Show() {
 			Window::Show();
 			::SetColor(borderColor, bgColor);
 			GotoXY(x, y-2);
